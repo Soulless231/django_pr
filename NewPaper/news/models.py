@@ -2,10 +2,21 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
+NEWS = 'NW'
+ARTICLE = 'AR'
+CATEGORY_CHOICES = [
+    ('NEWS', 'Новость'),
+    ('ARTICLE', 'Статья')
+]
+
 
 class Author(models.Model):
     authorUser = models.OneToOneField(User, on_delete=models.CASCADE)
     ratingAuthor = models.SmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Автор'
+        verbose_name_plural = 'Авторы'
 
     def update_rating(self):
         postRat = self.post_set.aggregate(postRating=Sum('rating'))
@@ -19,26 +30,40 @@ class Author(models.Model):
         self.ratingAuthor = pRat * 3 + cRat
         self.save()
 
+    def __str__(self):
+        return f'Автор: {self.authorUser.username}'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return f'Категория: {self.name}'
 
 
 class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
-    NEWS = 'NW'
-    ARTICLE = 'AR'
-    CATEGORY_CHOICES = (
-        (NEWS, 'Новость'),
-        (ARTICLE, 'Статья'),
-    )
-    categoryType = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=ARTICLE)
-    dateCreation = models.DateTimeField(auto_now_add=True)
+    categoryType = models.CharField(max_length=7, choices=CATEGORY_CHOICES, default=ARTICLE)
+    date_time_in = models.DateTimeField(auto_now_add=True, )
     postCategory = models.ManyToManyField(Category, through='PostCategory')
     title = models.CharField(max_length=128)
     text = models.TextField()
     rating = models.SmallIntegerField(default=0)
+
+    def get_absolute_url(self):
+        return f'/posts/{self.id}'
+
+    def __str__(self):
+        return f'Статья: {self.title}. (Рейтинг: {self.rating}'
+
+    class Meta:
+        verbose_name = 'Статья'
+        verbose_name_plural = 'Статьи'
 
     def like(self):
         self.rating += 1
@@ -63,6 +88,10 @@ class Comment(models.Model):
     text = models.TextField()
     dateCreation = models.DateTimeField(auto_now_add=True)
     rating = models.SmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def like(self):
         self.rating += 1

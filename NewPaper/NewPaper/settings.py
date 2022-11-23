@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'news',
     'accounts',
+    'django_filters',
 ]
 
 SITE_ID = 1
@@ -63,7 +64,7 @@ ROOT_URLCONF = 'NewPaper.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'NewPaper/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,6 +118,8 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
+
+USE_L10N = True
 
 USE_TZ = True
 
